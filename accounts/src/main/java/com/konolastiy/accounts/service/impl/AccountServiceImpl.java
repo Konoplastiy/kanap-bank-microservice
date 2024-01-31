@@ -1,6 +1,6 @@
 package com.konolastiy.accounts.service.impl;
 
-import com.konolastiy.accounts.constants.AccountsConstants;
+import com.konolastiy.accounts.common.ApplicationConstants;
 import com.konolastiy.accounts.dto.AccountsDto;
 import com.konolastiy.accounts.dto.CustomerDto;
 import com.konolastiy.accounts.entity.Accounts;
@@ -15,7 +15,6 @@ import com.konolastiy.accounts.service.IAccountsService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.Random;
 
@@ -89,8 +88,8 @@ public class AccountServiceImpl implements IAccountsService {
         long randomAccNumber = 1000000000L + new Random().nextInt(900000000);
 
         newAccount.setAccountNumber(randomAccNumber);
-        newAccount.setAccountType(AccountsConstants.SAVINGS);
-        newAccount.setBranchAddress(AccountsConstants.ADDRESS);
+        newAccount.setAccountType(ApplicationConstants.Account.SAVINGS);
+        newAccount.setBranchAddress(ApplicationConstants.Account.ADDRESS);
         return newAccount;
     }
 }

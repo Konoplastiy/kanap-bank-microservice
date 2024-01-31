@@ -1,10 +1,10 @@
-package com.konolastiy.accounts.controller;
+package com.konoplastiy.loans.controller;
 
-import com.konolastiy.accounts.common.ApplicationConstants;
-import com.konolastiy.accounts.dto.CustomerDto;
-import com.konolastiy.accounts.dto.ErrorResponseDto;
-import com.konolastiy.accounts.dto.ResponseDto;
-import com.konolastiy.accounts.service.IAccountsService;
+import com.konoplastiy.loans.common.ApplicationConstants;
+import com.konoplastiy.loans.dto.ErrorResponseDto;
+import com.konoplastiy.loans.dto.LoansDto;
+import com.konoplastiy.loans.dto.ResponseDto;
+import com.konoplastiy.loans.service.ILoansService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -13,7 +13,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Pattern;
-import lombok.RequiredArgsConstructor;
+import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -21,20 +21,20 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 @Tag(
-        name = "CRUD REST Apis for Accounts in the KanapBank",
-        description = "CRUD REST APIs in KanapBank to CREATE, UPDATE, FETCH and DELETE account details"
+        name = "CRUD REST APIs for Loans in KanapBank",
+        description = "CRUD REST APIs in KanapBank to CREATE, UPDATE, FETCH AND DELETE loan details"
 )
 @RestController
+@RequestMapping(path = "/api/v1/loans", produces = {MediaType.APPLICATION_JSON_VALUE})
+@AllArgsConstructor
 @Validated
-@RequiredArgsConstructor
-@RequestMapping(path = "/api/v1/accounts", produces = {MediaType.APPLICATION_JSON_VALUE})
-public class AccountController {
+public class LoansController {
 
-    private final IAccountsService iAccountsService;
+    private ILoansService iLoansService;
 
     @Operation(
-            summary = "Create Account REST API",
-            description = "REST API to create new Customer &  Account inside EazyBank"
+            summary = "Create Loan REST API",
+            description = "REST API to create new loan inside KanapBank"
     )
     @ApiResponses({
             @ApiResponse(
@@ -51,15 +51,18 @@ public class AccountController {
     }
     )
     @PostMapping
-    public ResponseEntity<ResponseDto> createAccount(@Valid @RequestBody CustomerDto customerDto) {
-        iAccountsService.createAccount(customerDto);
-        return ResponseEntity.status(HttpStatus.CREATED)
-                .body(new ResponseDto(ApplicationConstants.Account.STATUS_201, ApplicationConstants.Account.MESSAGE_201));
+    public ResponseEntity<ResponseDto> createLoan(@RequestParam
+                                                  @Pattern(regexp="(^$|[0-9]{10})",message = "Mobile number must be 10 digits")
+                                                  String mobileNumber) {
+        iLoansService.createLoan(mobileNumber);
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(new ResponseDto(ApplicationConstants.Status.STATUS_201, ApplicationConstants.Status.MESSAGE_201));
     }
 
     @Operation(
-            summary = "Fetch Account Details REST API",
-            description = "REST API to fetch Customer &  Account details based on a mobile number"
+            summary = "Fetch Loan Details REST API",
+            description = "REST API to fetch loan details based on a mobile number"
     )
     @ApiResponses({
             @ApiResponse(
@@ -73,19 +76,19 @@ public class AccountController {
                             schema = @Schema(implementation = ErrorResponseDto.class)
                     )
             )
-    })
+    }
+    )
     @GetMapping
-    public ResponseEntity<CustomerDto> fetchAccountDetails(@RequestParam
-                                                           @Pattern(regexp = "(^$|[0-9]{10})", message = "Mobile number must be 10 digits")
-                                                           String mobileNumber) {
-        CustomerDto customerDto = iAccountsService.fetchAccount(mobileNumber);
-        return ResponseEntity.status(HttpStatus.OK).body(customerDto);
+    public ResponseEntity<LoansDto> fetchLoanDetails(@RequestParam
+                                                     @Pattern(regexp="(^$|[0-9]{10})",message = "Mobile number must be 10 digits")
+                                                     String mobileNumber) {
+        LoansDto loansDto = iLoansService.fetchLoan(mobileNumber);
+        return ResponseEntity.status(HttpStatus.OK).body(loansDto);
     }
 
-
     @Operation(
-            summary = "Update Account Details REST API",
-            description = "REST API to update Customer &  Account details based on a account number"
+            summary = "Update Loan Details REST API",
+            description = "REST API to update loan details based on a loan number"
     )
     @ApiResponses({
             @ApiResponse(
@@ -103,24 +106,25 @@ public class AccountController {
                             schema = @Schema(implementation = ErrorResponseDto.class)
                     )
             )
-    })
+    }
+    )
     @PutMapping
-    public ResponseEntity<ResponseDto> updateAccountDetails(@Valid @RequestBody CustomerDto customerDto) {
-        boolean isUpdated = iAccountsService.updateAccount(customerDto);
-        if (isUpdated) {
+    public ResponseEntity<ResponseDto> updateLoanDetails(@Valid @RequestBody LoansDto loansDto) {
+        boolean isUpdated = iLoansService.updateLoan(loansDto);
+        if(isUpdated) {
             return ResponseEntity
                     .status(HttpStatus.OK)
-                    .body(new ResponseDto(ApplicationConstants.Account.STATUS_200, ApplicationConstants.Account.MESSAGE_200));
-        } else {
+                    .body(new ResponseDto(ApplicationConstants.Status.STATUS_200, ApplicationConstants.Status.MESSAGE_200));
+        }else{
             return ResponseEntity
                     .status(HttpStatus.EXPECTATION_FAILED)
-                    .body(new ResponseDto(ApplicationConstants.Account.STATUS_417, ApplicationConstants.Account.MESSAGE_417_UPDATE));
+                    .body(new ResponseDto(ApplicationConstants.Status.STATUS_417, ApplicationConstants.Status.MESSAGE_417_UPDATE));
         }
     }
 
     @Operation(
-            summary = "Delete Account & Customer Details REST API",
-            description = "REST API to delete Customer &  Account details based on a mobile number"
+            summary = "Delete Loan Details REST API",
+            description = "REST API to delete Loan details based on a mobile number"
     )
     @ApiResponses({
             @ApiResponse(
@@ -138,20 +142,22 @@ public class AccountController {
                             schema = @Schema(implementation = ErrorResponseDto.class)
                     )
             )
-    })
+    }
+    )
     @DeleteMapping
-    public ResponseEntity<ResponseDto> deleteAccountDetails(@RequestParam
-                                                            @Pattern(regexp = "(^$|[0-9]{10})", message = "Mobile number must be 10 digits")
-                                                            String mobileNumber) {
-        boolean isDeleted = iAccountsService.deleteAccount(mobileNumber);
-        if (isDeleted) {
+    public ResponseEntity<ResponseDto> deleteLoanDetails(@RequestParam
+                                                         @Pattern(regexp="(^$|[0-9]{10})",message = "Mobile number must be 10 digits")
+                                                         String mobileNumber) {
+        boolean isDeleted = iLoansService.deleteLoan(mobileNumber);
+        if(isDeleted) {
             return ResponseEntity
                     .status(HttpStatus.OK)
-                    .body(new ResponseDto(ApplicationConstants.Account.STATUS_200, ApplicationConstants.Account.MESSAGE_200));
-        } else {
+                    .body(new ResponseDto(ApplicationConstants.Status.STATUS_200, ApplicationConstants.Status.MESSAGE_200));
+        }else{
             return ResponseEntity
                     .status(HttpStatus.EXPECTATION_FAILED)
-                    .body(new ResponseDto(ApplicationConstants.Account.STATUS_417, ApplicationConstants.Account.MESSAGE_417_DELETE));
+                    .body(new ResponseDto(ApplicationConstants.Status.STATUS_417, ApplicationConstants.Status.MESSAGE_417_DELETE));
         }
     }
+
 }
