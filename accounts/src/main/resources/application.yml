@@ -1,5 +1,5 @@
 server:
-  port:
+  port: 8080
 
 spring:
   datasource:
@@ -15,3 +15,13 @@ spring:
     hibernate:
       ddl-auto: update
     show-sql: true
+  config:
+    import:
+      - "application_local.yml"
+      - "application_prod.yml"
+  profiles:
+    active:
+      - "local"
+
+build:
+  version: "3.0"
