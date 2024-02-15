@@ -22,7 +22,7 @@ import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
                 contact = @Contact(
                         name = "Andrew Reddy",
                         email = "tutor@eazybytes.com",
-                        url = "https://www.eazybytes.com"
+                        url = "https://www.kanap.com"
                 ),
                 license = @License(
                         name = "Apache 2.0",
@@ -31,7 +31,7 @@ import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
         ),
         externalDocs = @ExternalDocumentation(
                 description = "KanapBank Loans microservice REST API Documentation",
-                url = "https://www.eazybytes.com/swagger-ui.html"
+                url = "https://www.kanap.com/swagger-ui.html"
         )
 )
 public class LoansApplication {
